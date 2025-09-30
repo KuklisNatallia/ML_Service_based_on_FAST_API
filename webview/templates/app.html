@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Программа для предсказаний вида ириса</title>
+</head>
+<body>
+    <!-- Форма регистрации -->
+    {% if not registered %}
+    <h1>Добро пожаловать!</h1>
+    <h3>Пожалуйста, зарегистрируйтесь, чтобы продолжить.</h3>
+    <p>Для начала работы необходимо зарегистрироваться.</p>
+
+    <form method="POST" action="/api/users/register">
+        <div>
+            <label>Введите ваш логин:</label><br>
+            <input type="text" name="username" value="{{ username|default('') }}" required>
+        </div>
+
+        <div>
+            <label>Введите ваш email:</label><br>
+            <input type="email" name="email" value="{{ email|default('') }}" required maxlength="100">
+        </div>
+
+        <div>
+            <label>Введите пароль (минимум 8 символов):</label><br>
+            <input type="password" name="password" minlength="8" required maxlength="200">
+        </div>
+
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+
+    <!-- Форма входа -->
+    <h3>Уже есть аккаунт?</h3>
+    <form method="POST" action="/api/users/login">
+        <div>
+            <label>Email:</label><br>
+            <input type="email" name="username" required>
+        </div>
+
+        <div>
+            <label>Пароль:</label><br>
+            <input type="password" name="password" required>
+        </div>
+
+        <button type="submit">Войти</button>
+    </form>
+
+    <!-- После успешной регистрации/входа -->
+    {% elif registered and not prediction_made %}
+    <h1>Добро пожаловать, {{ username }}!</h1>
+
+    <div>
+        <h4>Ваш баланс: {{ balance|default(0)|float }} </h4>
+    </div>
+
+    <h4>Выберите действие:</h4>
+
+    <div>
+        <form method="POST" action="/balance">
+            <label>Сумма пополнения:</label><br>
+            <input type="number" name="amount" value="10" min="1" step="0.01">
+            <button type="submit">Пополнить баланс</button>
+        </form>
+
+        <form method="POST" action="/prediction">
+            <h4>Данные для предсказания (опционально):</h4>
+            <label>Длина лепестка (petal_length):</label><br>
+            <input type="number" name="petal_length" step="0.1" placeholder="1.0-7.0"><br>
+
+            <label>Ширина лепестка (petal_width):</label><br>
+            <input type="number" name="petal_width" step="0.1" placeholder="0.1-2.5"><br>
+
+            <button type="submit">Сделать предсказание (-10)</button>
+        </form>
+    </div>
+
+    <!-- Результат предсказания -->
+    {% elif prediction_made %}
+    <h1>Результат предсказания</h1>
+
+    <div>
+        <h3>Ваше предсказание:</h3>
+        {% if prediction_result %}
+            {% for result in prediction_result %}
+                <p><strong>Вид ириса: {{ result.color|default('неизвестно') }}</strong></p>
+                {% if result.color == "setosa" %}
+                    <p>Iris setosa - ирис щетинистый</p>
+                {% elif result.color == "versicolor" %}
+                    <p>Iris versicolor - ирис разноцветный</p>
+                {% elif result.color == "virginica" %}
+                    <p>Iris virginica - ирис виргинский</p>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <p>Не удалось получить результат предсказания</p>
+        {% endif %}
+    </div>
+
+    <div>
+        <h4>Текущий баланс: {{ balance|float }} </h4>
+    </div>
+
+    <div>
+        <form method="GET" action="/">
+            <button type="submit">Вернуться в меню</button>
+        </form>
+    </div>
+
+    {% endif %}
+
+    <!-- Сообщения об ошибках -->
+    {% if error_message %}
+    <div style="color: red; margin-top: 20px;">
+        <strong>Ошибка:</strong> {{ error_message }}
+    </div>
+    {% endif %}
+
+    <!-- Сообщения об успехе -->
+    {% if success_message %}
+    <div style="color: green; margin-top: 20px;">
+        <strong>{{ success_message }}</strong>
+    </div>
+    {% endif %}
+
+    <!-- Выход для зарегистрированных пользователей -->
+    {% if registered %}
+    <div style="margin-top: 20px;">
+        <form method="POST" action="/logout">
+            <button type="submit">Выйти</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Ссылка на API предсказаний -->
+    {% if registered %}
+    <div style="margin-top: 20px;">
+        <a href="/api/predictions" target="_blank">Посмотреть все мои предсказания (API)</a>
+    </div>
+    {% endif %}
+</body>
+</html>
