@@ -1,0 +1,13 @@
+/app/services/RabbitMQ/__init__.py
+/app/test/__ini__.py
+/app/database/__init__.py
+/app/modelses/__init__.py
+/app/routes/__init__.py
+/app/services/__init__.py
+/app/services/auth/__init__.py
+/app/services/crud/__init__.py
+/app/test/api1/__init__.py
+/app/test/__init__.py
+/app/webview/__init__.py
+/app/__init__.py
+/__init__.py
